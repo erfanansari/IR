@@ -63,6 +63,7 @@ while inp!=0 :
     print("9 - load posting from file")
     print("10 - compressions ")
     print("11 - search")
+    print("12 - shit i need to take care of")
     print("0 - Exit")
     inp=int(input())
     if inp==0 :
@@ -376,5 +377,7 @@ while inp!=0 :
                 print("retrived documents:")
                 for doc_id in found_docs:
                     print(f"DocID: {doc_id}")
+    elif inp==12:
+        print("You selected option 12!")
     else :
         print("Wrong input! Try again :)")
