@@ -15,14 +15,14 @@ def persian_text_proccess(f:str):
     tokens=tokenizer.tokenize(f)
     #print(tokens)
 
-    # exlude numbers
+    # exclude numbers
     nonum_tokens=[]
     for i in tokens:
         if not i.isdigit() :
             nonum_tokens.append(i)
     #print(nonum_tokens)
 
-    # exclude punctiations
+    # exclude punctuations
     nopunc_tokens=[i for i in nonum_tokens if i not in "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}٫~،«»؛؟"]
     #print(nopunc_tokens)
 
