@@ -23,7 +23,7 @@ def persian_text_proccess(f:str):
     #print(nonum_tokens)
 
     # exclude punctiations
-    nopunc_tokens=[i for i in nonum_tokens if i not in "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}٫~،«»؛؟"]
+    nopunc_tokens=[i for i in nonum_tokens if i not in "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}٫~،«»؛؟"]
     #print(nopunc_tokens)
 
     # exclude stop words
@@ -43,6 +43,31 @@ def persian_text_proccess(f:str):
 
     return lm_tokens
 
+def evaluate_search(retrieved_docs, query, queries_file="queries.json"):
+    with open(queries_file, "r", encoding="utf-8") as f:
+        queries = json.load(f)
+    relevant_docs = set(queries.get(query, []))
+    retrieved_set = set(retrieved_docs)
+    # Precision, Recall, F-measure
+    true_positives = len(retrieved_set & relevant_docs)
+    precision = true_positives / len(retrieved_set) if retrieved_set else 0
+    recall = true_positives / len(relevant_docs) if relevant_docs else 0
+    if precision + recall == 0:
+        f_measure = 0
+    else:
+        f_measure = 2 * precision * recall / (precision + recall)
+    # MAP
+    ap_sum = 0
+    num_rel = 0
+    for i, doc_id in enumerate(retrieved_docs, 1):
+        if doc_id in relevant_docs:
+            num_rel += 1
+            ap_sum += num_rel / i
+    map_score = ap_sum / len(relevant_docs) if relevant_docs else 0
+    print(f"Precision: {precision:.3f}")
+    print(f"Recall: {recall:.3f}")
+    print(f"F-measure: {f_measure:.3f}")
+    print(f"MAP: {map_score:.3f}")
 
 hamshahri=HamshahriReader(root="HAM2")
 docs=hamshahri.docs()
@@ -63,7 +88,6 @@ while inp!=0 :
     print("9 - load posting from file")
     print("10 - compressions ")
     print("11 - search")
-    print("12 - shit i need to take care of")
     print("0 - Exit")
     inp=int(input())
     if inp==0 :
@@ -341,6 +365,10 @@ while inp!=0 :
                 #only show top 10
                 for doc_id, score in sorted_docs[:10]:
                     print(f"DocID: {doc_id}, Score: {score:.4f}")
+                # Evaluate
+                retrieved_doc_ids = [doc_id for doc_id, score in sorted_docs[:10]]
+                evaluate_search(retrieved_doc_ids, query)
+
         elif inp3==2:
             query = input("input your query: ")
             import re
@@ -377,7 +405,9 @@ while inp!=0 :
                 print("retrived documents:")
                 for doc_id in found_docs:
                     print(f"DocID: {doc_id}")
-    elif inp==12:
-        print("You selected option 12!")
+                # Evaluate
+                evaluate_search(found_docs, query)
     else :
         print("Wrong input! Try again :)")
+
+
